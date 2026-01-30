@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>LTD Market – Login Admin</title>
+<style>
+:root{
+  --primary:#6d28d9;
+  --bg:#0b0b14;
+  --card:#1c1c2b;
+  --text:#e5e7eb;
+  --border:#2a2a40;
+}
+body{
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+.card{
+  background:var(--card);
+  padding:30px;
+  border-radius:12px;
+  width:320px;
+  box-shadow:0 2px 15px rgba(0,0,0,0.5);
+}
+.card h2{ text-align:center; color:var(--primary); margin-bottom:20px; }
+.card input{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border:1px solid var(--border);
+  border-radius:6px;
+  background:#111122;
+  color:var(--text);
+}
+.card button{
+  width:100%;
+  padding:10px;
+  margin-top:12px;
+  border:none;
+  border-radius:6px;
+  background:var(--primary);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+.card button:hover{ opacity:0.9; }
+.back{ background:#333; margin-top:8px; }
+</style>
+</head>
+<body>
+<div class="card">
+<h2>Connexion Admin</h2>
+<input id="user" placeholder="Utilisateur">
+<input id="pass" type="password" placeholder="Mot de passe">
+<button onclick="login()">Se connecter</button>
+<button class="back" onclick="retour()">Retour</button>
+</div>
+<script>
+function login(){
+  if(user.value==="admin" && pass.value==="ltd123"){
+    localStorage.setItem("admin","true");
+    window.location.href="gestion.html";
+  } else alert("Identifiants incorrects");
+}
+function retour(){ window.location.href="commande.html"; }
+</script>
+</body>
+</html>

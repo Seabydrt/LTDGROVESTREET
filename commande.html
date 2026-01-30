@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>LTD Market – Commander</title>
+<style>
+/* ===== COLORS LTD ===== */
+:root{
+  --primary:#6d28d9;        /* violet LTD */
+  --primary-soft:#ede9fe;   /* violet clair */
+  --bg:#0b0b14;             /* fond sombre */
+  --card:#1c1c2b;           /* fond carte produit */
+  --text:#e5e7eb;           /* texte clair */
+  --text-light:#9ca3af;     /* texte secondaire */
+  --border:#2a2a40;         /* bordures */
+}
+
+/* ===== BASE ===== */
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  display:flex;
+  justify-content:center;
+  padding:40px 0;
+}
+
+.container{
+  max-width:1000px;
+  width:90%;
+}
+
+/* ===== HEADER ===== */
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:25px;
+}
+
+header h1{
+  color:var(--primary);
+  font-size:28px;
+  margin:0;
+}
+
+header button{
+  padding:8px 12px;
+  background:#333;
+  color:#fff;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+/* ===== PRODUCT GRID ===== */
+.products{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:20px;
+  margin-bottom:30px;
+}
+
+.card-product{
+  background:var(--card);
+  border-radius:8px;
+  padding:15px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.3);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  transition:transform 0.2s;
+}
+
+.card-product:hover{
+  transform:translateY(-5px);
+}
+
+.card-product img{
+  width:100%;
+  height:120px;
+  object-fit:contain;
+  margin-bottom:10px;
+}
+
+.card-product h3{
+  font-size:16px;
+  margin:0 0 5px;
+  color:var(--text);
+}
+
+.card-product p{
+  font-size:14px;
+  color:var(--text-light);
+  margin:0 0 10px;
+}
+
+.card-product input{
+  width:60px;
+  padding:5px;
+  border:1px solid var(--border);
+  border-radius:5px;
+  background:#111122;
+  color:var(--text);
+}
+
+.card-product button{
+  margin-top:5px;
+  padding:8px;
+  border:none;
+  background:var(--primary);
+  color:#fff;
+  border-radius:5px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.card-product button:hover{
+  opacity:0.9;
+}
+
+/* ===== CART ===== */
+.cart{
+  background:var(--card);
+  padding:15px;
+  border-radius:8px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.3);
+}
+
+.cart h2{
+  margin-top:0;
+  font-size:18px;
+  margin-bottom:15px;
+}
+
+.cart ul{
+  list-style:none;
+  padding:0;
+  margin:0 0 15px 0;
+}
+
+.cart li{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:10px;
+  font-size:14px;
+}
+
+.cart button{
+  padding:6px 10px;
+  background:#7f1d1d;
+  color:#fff;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+.cart button:hover{
+  opacity:0.9;
+}
+
+.checkout{
+  padding:10px;
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  width:100%;
+  border-radius:5px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.checkout:hover{
+  opacity:0.9;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>LTD Market</h1>
+  <button onclick="goAdmin()">Espace employé</button>
+</header>
+
+<!-- PRODUITS -->
+<div class="products" id="products">
+  <!-- Produits générés par JS -->
+</div>
+
+<!-- PANIER -->
+<div class="cart" id="cartDiv">
+  <h2>Panier</h2>
+  <ul id="cartList"></ul>
+  <button class="checkout" onclick="checkout()">Valider la commande</button>
+</div>
+
+<script>
+// ===== PRODUITS DISPONIBLES =====
+const products = [
+  {name:"Pelle", img:"data:image/jpeg;base64,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",price:45},
+  {name:"Radio", img:"https://www.motorolasolutions.com/content/dam/msi/images/business/products/two-way_radios/portable_radios/wide_area_large_business_portable_radios/xpr3500/_images/_staticfiles/xpr3500_lg.jpg",price:1800},
+  {name:"Téléphone", img:"https://cdn.movertix.com/media/catalog/product/cache/image/i/p/iphone-15-blue-512gb_4.jpg",price:420},
+  {name:"Appat de peche", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC4Jg0m3oAxpi9qumOBzlOZgYLWfGtW4nhLw&s",price:5},
+  {name:"Ticket de Loto", img:"https://media.istockphoto.com/id/2190594277/fr/vectoriel/mod%C3%A8le-de-billet-de-loterie-jackpot-avec-num%C3%A9ros.jpg?s=612x612&w=0&k=20&c=3aCw6NXA4xMkbF3Dyz2WoBjcrdVkleYEHg0BHEWc6-U=",price:60},
+  {name:"Ordinateur Portable", img:"https://tse4.mm.bing.net/th/id/OIP.TkdsjtlrBG9TBhRqKcsDCgHaE7?rs=1&pid=ImgDetMain&o=7&rm=3",price:390},
+  {name:"Briquet", img:"https://th.bing.com/th/id/R.e3995183d85d56446c6f3db86ff6a9e5?rik=Ge5Id%2bcE3R05IA&riu=http%3a%2f%2flecatalog.com%2fmedia%2fcatalog%2fproduct%2fb%2fr%2fbriquet-zippo-dupont-lighter-3-lecatalog.com.jpg&ehk=gDs4nNBOr73F5xcb85u59CY7UX0Ue65XE8DTg5XmKjw%3d&risl=&pid=ImgRaw&r=0",price:72},
+  {name:"Gel Plaquant", img:"https://m.media-amazon.com/images/I/714vodBwsiL.jpg",price:186},
+  {name:"Cintre", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRa19KrcRqSja-mzMmegOMtL7FmKuojOhINpQ&s",price:72},
+  {name:"Casserole", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeNTs91d-ow5TLSi1Vj2jA2SOJhn2Pf8cNgA&s",price:60},
+  {name:"Canne a pêche", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyV7zyWqyPPs_oIcsSVfwtwVpPW5ULDrJZ1Q&s",price:72},
+  {name:"Bombe de peinture", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRR5jYURYM8kG8O22T4zXg7BVGgiaUpRNl_Xg&s",price:180},
+  {name:"Jumelles", img:"https://www.jumelles.com/cdn/shop/products/JumellesVortexCrossfireHD10x42-2.webp?v=1699413817",price:1050},
+  {name:"BMX", img:"https://media.intersport.fr/is/image/intersportfr/YC60J0TAKU_Q1?$product_grey$&layer=comp&fit=constrain,0&$produit_xl$&fmt=webp",price:480},
+];
+
+// ===== PANIER =====
+let cart = [];
+
+// GENERER LES PRODUITS
+const productsDiv = document.getElementById("products");
+products.forEach((p,i)=>{
+  const div = document.createElement("div");
+  div.className = "card-product";
+  div.innerHTML = `
+    <img src="${p.img}" alt="${p.name}">
+    <h3>${p.name}</h3>
+    <p>Prix: $${p.price}</p>
+    <input type="number" min="1" value="1" id="q${i}">
+    <button onclick="addToCart(${i})">Ajouter au panier</button>
+  `;
+  productsDiv.appendChild(div);
+});
+
+// AJOUTER AU PANIER
+function addToCart(i){
+  const qty = Number(document.getElementById("q"+i).value);
+  if(!qty || qty<=0){ alert("Quantité invalide"); return; }
+  cart.push({name:products[i].name, qty});
+  renderCart();
+}
+
+// AFFICHER PANIER
+function renderCart(){
+  const ul = document.getElementById("cartList");
+  ul.innerHTML = "";
+  cart.forEach((item,i)=>{
+    const li = document.createElement("li");
+    li.innerHTML = `${item.name} x${item.qty} <button onclick="removeCart(${i})">Supprimer</button>`;
+    ul.appendChild(li);
+  });
+}
+
+// SUPPRIMER ITEM
+function removeCart(i){
+  cart.splice(i,1);
+  renderCart();
+}
+
+// VALIDER COMMANDE
+function checkout(){
+  if(cart.length===0){ alert("Panier vide"); return; }
+
+  const clientName = prompt("Nom du client:");
+  const clientTel = prompt("Téléphone:");
+  if(!clientName || !clientTel){ alert("Informations manquantes"); return; }
+
+  const cmd = JSON.parse(localStorage.getItem("cmd"))||[];
+  cmd.push({client:clientName,tel:clientTel,panier:cart,statut:"En attente"});
+  localStorage.setItem("cmd",JSON.stringify(cmd));
+  alert("Commande envoyée au LTD !");
+
+  cart=[];
+  renderCart();
+}
+
+// ADMIN
+function goAdmin(){
+  window.location.href = "login.html";
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>LTD Market – Gestion</title>
+<style>
+:root{
+  --primary:#6d28d9;
+  --bg:#0b0b14;
+  --card:#1c1c2b;
+  --text:#e5e7eb;
+  --text-light:#9ca3af;
+  --border:#2a2a40;
+}
+body{
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  padding:20px;
+}
+h1{ color:var(--primary); text-align:center; margin-bottom:20px; }
+table{ width:100%; border-collapse:collapse; }
+th, td{ padding:10px; border-bottom:1px solid var(--border); text-align:center; }
+th{ color:var(--text-light); }
+button{ padding:6px 10px; border:none; border-radius:5px; cursor:pointer; }
+.ok{ background:#22c55e; color:#fff; }
+.del{ background:#7f1d1d; color:#fff; }
+.logout{ background:#333; color:#fff; margin-bottom:15px; }
+.logout:hover, .ok:hover, .del:hover{ opacity:0.9; }
+</style>
+</head>
+<body>
+<h1>Dashboard Admin - LTD</h1>
+<button class="logout" onclick="logout()">Déconnexion</button>
+<table>
+<thead>
+<tr>
+<th>Client</th>
+<th>Téléphone</th>
+<th>Panier</th>
+<th>Statut</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="list"></tbody>
+</table>
+<script>
+if(localStorage.getItem("admin")!=="true") window.location.href="login.html";
+let cmd = JSON.parse(localStorage.getItem("cmd"))||[];
+
+function afficher(){
+  const list = document.getElementById("list");
+  list.innerHTML='';
+  cmd.forEach((c,i)=>{
+    const items = c.panier.map(p=>`${p.name} x${p.qty}`).join('<br>');
+    list.innerHTML += `
+      <tr>
+        <td>${c.client}</td>
+        <td>${c.tel}</td>
+        <td>${items}</td>
+        <td>${c.statut}</td>
+        <td>
+          <button class="ok" onclick="ok(${i})">✔</button>
+          <button class="del" onclick="del(${i})">✖</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function ok(i){ cmd[i].statut="Livrée"; save(); }
+function del(i){ cmd.splice(i,1); save(); }
+function save(){ localStorage.setItem("cmd",JSON.stringify(cmd)); afficher(); }
+function logout(){ localStorage.removeItem("admin"); window.location.href="login.html"; }
+
+afficher();
+</script>
+</body>
+</html>
